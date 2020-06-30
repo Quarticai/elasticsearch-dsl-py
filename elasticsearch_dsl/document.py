@@ -283,11 +283,8 @@ class DocType(ObjectBase):
         """
         es = self._get_connection(using)
         # extract routing etc from meta
-        doc_meta = dict(
-            (k, self.meta[k])
-            for k in DOC_META_FIELDS
-            if k in self.meta
-        )
+        doc_meta = {k: self.meta[k] for k in DOC_META_FIELDS
+                if k in self.meta}
         doc_meta.update(kwargs)
         es.delete(
             index=self._get_index(index),
@@ -311,11 +308,8 @@ class DocType(ObjectBase):
         if not include_meta:
             return d
 
-        meta = dict(
-            ('_' + k, self.meta[k])
-            for k in DOC_META_FIELDS
-            if k in self.meta
-        )
+        meta = {'_' + k: self.meta[k] for k in DOC_META_FIELDS
+                if k in self.meta}
 
         # in case of to_dict include the index unlike save/update/delete
         if 'index' in self.meta:
@@ -357,17 +351,11 @@ class DocType(ObjectBase):
         values = self.to_dict()
 
         # if fields were given: partial update
-        doc = dict(
-            (k, values.get(k))
-            for k in fields.keys()
-        )
+        doc = {k: values.get(k) for k in fields.keys()}
 
         # extract routing etc from meta
-        doc_meta = dict(
-            (k, self.meta[k])
-            for k in DOC_META_FIELDS
-            if k in self.meta
-        )
+        doc_meta = {k: self.meta[k] for k in DOC_META_FIELDS
+                if k in self.meta}
         body = {
             'doc': doc,
             'doc_as_upsert': doc_as_upsert,
@@ -405,11 +393,8 @@ class DocType(ObjectBase):
 
         es = self._get_connection(using)
         # extract routing etc from meta
-        doc_meta = dict(
-            (k, self.meta[k])
-            for k in DOC_META_FIELDS
-            if k in self.meta
-        )
+        doc_meta = {k: self.meta[k] for k in DOC_META_FIELDS
+                if k in self.meta}
         doc_meta.update(kwargs)
         meta = es.index(
             index=self._get_index(index),

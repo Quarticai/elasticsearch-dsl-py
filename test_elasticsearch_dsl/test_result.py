@@ -77,7 +77,7 @@ def test_len_response(dummy_response):
 
 def test_iterating_over_response_gives_you_hits(dummy_response):
     res = response.Response(Search(), dummy_response)
-    hits = list(h for h in res)
+    hits = list(res)
 
     assert res.success()
     assert 123 == res.took

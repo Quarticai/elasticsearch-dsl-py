@@ -41,12 +41,10 @@ class Properties(DslBase):
             yield f
             # multi fields
             if hasattr(f, 'fields'):
-                for inner_f in itervalues(f.fields.to_dict()):
-                    yield inner_f
+                yield from itervalues(f.fields.to_dict())
             # nested and inner objects
             if hasattr(f, '_collect_fields'):
-                for inner_f in f._collect_fields():
-                    yield inner_f
+                yield from f._collect_fields()
 
     def update(self, other_object):
         if not hasattr(other_object, 'properties'):

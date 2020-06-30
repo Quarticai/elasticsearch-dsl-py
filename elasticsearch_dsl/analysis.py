@@ -12,7 +12,7 @@ class AnalysisBase(object):
                 raise ValueError('%s() cannot accept parameters.' % cls.__name__)
             return name_or_instance
 
-        if not (type or kwargs):
+        if not type and not kwargs:
             return cls.get_dsl_class('builtin')(name_or_instance)
 
         return cls.get_dsl_class('custom')(name_or_instance, type or 'custom', **kwargs)
@@ -42,13 +42,21 @@ class CustomAnalysisDefinition(CustomAnalysis):
         if 'tokenizer' in self._param_defs and hasattr(t, 'get_definition'):
             out['tokenizer'] = {t._name: t.get_definition()}
 
-        filters = dict((f._name, f.get_definition())
-                       for f in self.filter if hasattr(f, 'get_definition'))
+        filters = {
+            f._name: f.get_definition()
+            for f in self.filter
+            if hasattr(f, 'get_definition')
+        }
+
         if filters:
             out['filter'] = filters
 
-        char_filters = dict((f._name, f.get_definition())
-                            for f in self.char_filter if hasattr(f, 'get_definition'))
+        char_filters = {
+            f._name: f.get_definition()
+            for f in self.char_filter
+            if hasattr(f, 'get_definition')
+        }
+
         if char_filters:
             out['char_filter'] = char_filters
 

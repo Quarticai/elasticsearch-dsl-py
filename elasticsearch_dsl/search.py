@@ -162,10 +162,14 @@ class Request(object):
         """
         Return a list of doc_type names to be used
         """
-        return list(set(dt._doc_type.name if hasattr(dt, '_doc_type') else dt for dt in self._doc_type))
+        return list(
+            {
+                dt._doc_type.name if hasattr(dt, '_doc_type') else dt
+                for dt in self._doc_type
+            }
+        )
 
     def _resolve_nested(self, field, parent_class=None):
-        doc_class = Hit
         nested_field = None
         if hasattr(parent_class, '_doc_type'):
             nested_field = parent_class._doc_type.resolve_field(field)
@@ -181,7 +185,7 @@ class Request(object):
         if nested_field is not None:
             return nested_field._doc_class
 
-        return doc_class
+        return Hit
 
     def _get_result(self, hit, parent_class=None):
         doc_class = Hit
@@ -223,7 +227,7 @@ class Request(object):
         """
         # .doc_type() resets
         s = self._clone()
-        if not doc_type and not kwargs:
+        if not (doc_type or kwargs):
             s._doc_type = []
             s._doc_type_map = {}
         else:
@@ -329,14 +333,14 @@ class Search(Request):
             # stop not given.
             s._extra['from'] = n.start or 0
             s._extra['size'] = n.stop - (n.start or 0) if n.stop is not None else 10
-            return s
         else:  # This is an index lookup, equivalent to slicing by [n:n+1].
             # If negative index, abort.
             if n < 0:
                 raise ValueError("Search does not support negative indexing.")
             s._extra['from'] = n
             s._extra['size'] = 1
-            return s
+
+        return s
 
     @classmethod
     def from_dict(cls, d):
@@ -406,9 +410,9 @@ class Search(Request):
         aggs = d.pop('aggs', d.pop('aggregations', {}))
         if aggs:
             self.aggs._params = {
-                'aggs': dict(
-                    (name, A(value)) for (name, value) in iteritems(aggs))
+                'aggs': {name: A(value) for (name, value) in iteritems(aggs)}
             }
+
         if 'sort' in d:
             self._sort = d.pop('sort')
         if '_source' in d:

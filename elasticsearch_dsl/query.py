@@ -170,7 +170,7 @@ class Bool(Query):
                 else:
                     q.must.append(Bool(should=qx.should, minimum_should_match=min_should_match))
         else:
-            if not (q.must or q.filter) and q.should:
+            if not q.must and not q.filter and q.should:
                 q._params.setdefault('minimum_should_match', 1)
             q.must.append(other)
         return q
@@ -185,9 +185,7 @@ class FunctionScore(Query):
     }
 
     def __init__(self, **kwargs):
-        if 'functions' in kwargs:
-            pass
-        else:
+        if 'functions' not in kwargs:
             fns = kwargs['functions'] = []
             for name in ScoreFunction._classes:
                 if name in kwargs:
